@@ -1,9 +1,34 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, ScrollView,Text, TouchableOpacity, TouchableOpacityComponent, View, Platform, KeyboardAvoidingView, TextInput, Keyboard } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import  AsyncStorage  from '@react-native-async-storage/async-storage'
 import Task from './components/Task';
 
 export default function App() {
+
+  const saveTasks = async (tasks) => {
+    try {
+      await AsyncStorage.setItem('tasks', JSON.stringify(tasks))
+    } catch(error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const savedTasks = await AsyncStorage.getItem('tasks');
+        if (savedTasks !== null) {
+          setTasks(JSON.parse(savedTasks));
+        }
+      } catch (error) {
+        console.error('Error loading tasks:', error);
+      }
+    };
+  
+    loadTasks();
+  }, []);
+  
 
   const [task, setTask] = useState()
   const [tasks, setTasks] = useState([])
@@ -21,8 +46,11 @@ export default function App() {
     setShowOverlay(false)
     Keyboard.dismiss()
     if(task == "") return
-    setTasks([...tasks, task])
+    let newTasks = [...tasks, task]
+    setTasks(newTasks)  
+    saveTasks(newTasks) 
     setTask('')
+
   }
 
   const handleChangeText = (text) => {
@@ -33,6 +61,7 @@ export default function App() {
     let copyTask = [...tasks]
     copyTask.splice(index, 1)
     setTasks(copyTask)
+    saveTasks(copyTask)
   }
   return (
     <View style={styles.container}>
