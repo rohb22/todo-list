@@ -65,6 +65,7 @@ export default function App() {
   }
   return (
     <View style={styles.container}>
+      <StatusBar style="auto" />
       {showOverlay && (<View style={styles.addOverlay}>
         <View style={styles.addForm}>
           <TextInput style={styles.taskInput} placeholder="What's todays new task" value={task} onChangeText={handleChangeText}></TextInput>
